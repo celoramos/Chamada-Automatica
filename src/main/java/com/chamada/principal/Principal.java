@@ -61,8 +61,7 @@ public class Principal {
         if (erro != null) {
             System.out.println("Presença NÃO registrada: " + erro);
             return;
-        }
-        chamada.registrarPresenca(matricula);
+        } chamada.registrarPresenca(matricula);
     }
 
     private void renovarQrCode() {

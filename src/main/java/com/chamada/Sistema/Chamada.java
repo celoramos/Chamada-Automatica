@@ -1,7 +1,6 @@
 package com.chamada.Sistema;
 
 import com.chamada.Aluno.Aluno;
-
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -13,7 +12,6 @@ public class Chamada {
     private final String abertaEm = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
     private final String disciplina;
     private final List<Aluno> turma;
-    // Aluno presente -> hora em que registrou a presença
     private final Map<Aluno, String> presentes = new HashMap<>();
     private QRCode qrCode = new QRCode();
 
@@ -26,9 +24,7 @@ public class Chamada {
         return qrCode;
     }
 
-    // Devolve false quando a renovação não é permitida
     public boolean renovarQrCode() {
-        // TODO: definir a política de renovação (hoje: sempre permitida, sem limite)
         qrCode = new QRCode();
         return true;
     }

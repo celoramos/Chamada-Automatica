@@ -1,9 +1,5 @@
-# Build do Maven
 target/
-
-# Configuração local do IntelliJ IDEA
 .idea/
+.vscode/
 *.iml
-
-# Imagem gerada a cada execução por QRCode.salvarImagem()
 qrcode.png

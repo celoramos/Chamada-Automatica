@@ -1,32 +1,37 @@
 package com.chamada.Sistema;
 
 import com.chamada.Aluno.Aluno;
+
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Chamada {
-    private final String abertaEm = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+    private final String abertaEm;
     private final String disciplina;
     private final List<Aluno> turma;
-    private final Map<Aluno, String> presentes = new HashMap<>();
-    private QRCode qrCode = new QRCode();
+
+    // Apenas a thread consumidora registra presenças neste mapa.
+    private final Map<Aluno, String> presentes = new LinkedHashMap<>();
+
+    private QRCode qrCode;
 
     public Chamada(String disciplina, List<Aluno> turma) {
         this.disciplina = disciplina;
         this.turma = turma;
+        this.abertaEm = LocalDateTime.now()
+                .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+        this.qrCode = new QRCode();
     }
 
     public QRCode getQrCode() {
         return qrCode;
     }
 
-    public boolean renovarQrCode() {
+    public void renovarQrCode() {
         qrCode = new QRCode();
-        return true;
     }
 
     private Aluno buscarAluno(String matricula) {
@@ -38,34 +43,65 @@ public class Chamada {
         return null;
     }
 
-    public String validar(String matricula, String codigoLido) {
-        Aluno aluno = buscarAluno(matricula);
-        if (aluno == null) {return "a matrícula " + matricula + " não pertence a esta turma.";}
-        if (presentes.containsKey(aluno)) {return "a presença de " + aluno.getNome() + " já foi registrada.";}
-        if (!qrCode.confere(codigoLido)) {return "o QR Code lido não é o desta aula.";}
-        if (qrCode.expirou()) {return "o QR Code expirou (fora do horário da chamada).";}
+    /**
+     * A validação acontece somente no consumidor.
+     * O horário usado é o instante em que o produtor criou a solicitação.
+     */
+    public String validar(SolicitacaoPresenca solicitacao) {
+        Aluno aluno = buscarAluno(solicitacao.getMatricula());
+
+        if (aluno == null) {
+            return "a matrícula " + solicitacao.getMatricula()
+                    + " não pertence a esta turma.";
+        }
+
+        if (presentes.containsKey(aluno)) {
+            return "a presença de " + aluno.getNome() + " já foi registrada.";
+        }
+
+        if (!qrCode.confere(solicitacao.getCodigoLido())) {
+            return "o QR Code lido não corresponde ao QR Code atual da aula.";
+        }
+
+        if (qrCode.expirouEm(solicitacao.getHorarioSolicitacao())) {
+            return "o QR Code já estava expirado quando a solicitação foi enviada.";
+        }
+
         return null;
     }
 
-    public void registrarPresenca(String matricula) {
-        Aluno aluno = buscarAluno(matricula);
-        presentes.put(aluno, LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
-        System.out.println("PRESENÇA registrada: " + aluno.getNome());
+    public void registrarPresenca(SolicitacaoPresenca solicitacao) {
+        Aluno aluno = buscarAluno(solicitacao.getMatricula());
+
+        String horario = solicitacao.getHorarioSolicitacao()
+                .format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+
+        presentes.put(aluno, horario);
+
+        System.out.println("[REGISTRO] Presença registrada: "
+                + aluno.getNome() + " às " + horario + ".");
     }
 
-    // Quem está na turma e não registrou presença fica com FALTA
     public void gerarRelatorio() {
         System.out.println("\n===== RELATÓRIO DE FREQUÊNCIA =====");
         System.out.println("Disciplina: " + disciplina);
         System.out.println("Chamada aberta em: " + abertaEm);
-        System.out.println("-----------------------------------------------------");
-        System.out.printf("%-10s %-22s %-9s %s%n", "MATRÍCULA", "ALUNO", "STATUS", "HORA");
+        System.out.println("---------------------------------------------------------------");
+        System.out.printf("%-10s %-24s %-10s %s%n",
+                "MATRÍCULA", "ALUNO", "STATUS", "HORA");
+
         for (Aluno aluno : turma) {
-            String hora = presentes.get(aluno);
-            System.out.printf("%-10s %-22s %-9s %s%n", aluno.getMatricula(), aluno.getNome(),
-                    hora != null ? "PRESENÇA" : "FALTA", hora != null ? hora : "-");
+            String horario = presentes.get(aluno);
+
+            System.out.printf("%-10s %-24s %-10s %s%n",
+                    aluno.getMatricula(),
+                    aluno.getNome(),
+                    horario != null ? "PRESENTE" : "FALTA",
+                    horario != null ? horario : "-");
         }
-        System.out.println("-----------------------------------------------------");
-        System.out.println("Presentes: " + presentes.size() + " | Faltas: " + (turma.size() - presentes.size()));
+
+        System.out.println("---------------------------------------------------------------");
+        System.out.println("Presentes: " + presentes.size()
+                + " | Faltas: " + (turma.size() - presentes.size()));
     }
 }

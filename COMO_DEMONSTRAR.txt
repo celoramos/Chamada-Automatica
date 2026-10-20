@@ -1,0 +1,47 @@
+DEMONSTRAÇÃO PRODUTOR/CONSUMIDOR
+================================
+
+1. Escolha 1 - Abrir chamada.
+2. Escolha 2 - Registrar presenças (modo aluno).
+3. Digite, rapidamente, por exemplo:
+
+20001234
+20005678
+20009012
+20003456
+20007890
+20001111
+
+Cada linha é uma entrada manual e cria uma thread produtora.
+Não existe uma rotina que cria alunos automaticamente.
+
+O consumidor processa uma solicitação a cada 4 segundos.
+Como o buffer comporta 3 solicitações, em algum momento aparecerá:
+
+[VAGAS] Buffer cheio. Matrícula XXXXXXXX aguardando uma vaga...
+
+Isso significa que o semáforo "vagas" chegou a zero e bloqueou o produtor.
+
+Quando o consumidor retirar uma solicitação, ele executa vagas.release().
+Então uma das threads produtoras bloqueadas pode continuar.
+
+PAPEL DOS SEMÁFOROS
+-------------------
+vagas: posições livres do buffer.
+itens: quantidade de solicitações disponíveis para o consumidor.
+mutex: permite somente uma thread por vez dentro da região crítica da fila.
+
+IMPORTANTE
+----------
+No Principal, após produtor.start(), NÃO existe produtor.join().
+Por isso o terminal pode receber a próxima matrícula sem esperar o processamento anterior.
+Essa é a parte que permite o acúmulo de solicitações e torna o problema Produtor/Consumidor visível.
+
+
+COMANDOS DURANTE O MODO ALUNO
+------------------------------
+voltar ou 9   -> retorna ao menu do professor.
+encerrar ou 4 -> encerra a chamada e gera o relatório, depois de processar o que já foi enviado.
+
+Se o QR Code expirar, novas matrículas deixam de ser aceitas e o programa retorna ao menu do professor.
+Uma solicitação criada antes do vencimento continua válida mesmo se o consumidor terminar de processá-la depois.

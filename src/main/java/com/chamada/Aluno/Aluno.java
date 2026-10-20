@@ -1,4 +1,5 @@
 package com.chamada.Aluno;
+
 public class Aluno {
     private final String nome;
     private final String matricula;
@@ -8,6 +9,11 @@ public class Aluno {
         this.matricula = matricula;
     }
 
-    public String getNome() {return nome;}
-    public String getMatricula() {return matricula;}
+    public String getNome() {
+        return nome;
+    }
+
+    public String getMatricula() {
+        return matricula;
+    }
 }

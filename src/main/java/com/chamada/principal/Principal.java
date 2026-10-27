@@ -23,14 +23,16 @@ public class Principal {
     private final Professor professor = new Professor("Câmara", "Sistemas Operacionais");
 
     private final List<Aluno> turma = new ArrayList<>(List.of(
-            new Aluno("Marcelo Ramos", "20001234"),
-            new Aluno("Joao Danilo", "20005678"),
-            new Aluno("Caio Faria", "20009012"),
-            new Aluno("Maia", "20003456"),
-            new Aluno("Ana Souza", "20007890"),
-            new Aluno("Lucas Lima", "20001111"),
-            new Aluno("Pedro Santos", "20002222"),
-            new Aluno("Maria Oliveira", "20003333")));
+            new Aluno("Marcelo Ramos", "001"),
+            new Aluno("Joao Danilo", "002"),
+            new Aluno("Caio Faria", "003"),
+            new Aluno("Maia", "004"),
+            new Aluno("Ana Souza", "005"),
+            new Aluno("Paula Oliveira", "006"),
+            new Aluno("Pedro Santos", "007"),
+            new Aluno("Luis Gabriel", "008"),
+            new Aluno("Lara Silva", "009"),
+            new Aluno("Maria Oliveira", "010")));
 
     private final List<ProdutorAluno> produtoresCriados = new ArrayList<>();
 

@@ -16,7 +16,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class QRCode {
     // Tempo suficiente para a demonstração manual em sala.
-    private static final int VALIDADE_SEGUNDOS = 60;
+    private static final int VALIDADE_SEGUNDOS = 300;
     private static final int TAMANHO_IMAGEM = 300;
     private static final Path ARQUIVO_IMAGEM = Path.of("qrcode.png");
 
